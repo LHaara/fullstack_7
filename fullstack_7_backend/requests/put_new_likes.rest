@@ -1,0 +1,10 @@
+PUT http://localhost:3003/api/blogs/5bf8179caf33e954d622ecda
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Bitcoin",
+  "author": "Satoshi",
+  "url": "To the moon",
+  "likes": 50
+}
