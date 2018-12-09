@@ -5,69 +5,71 @@ import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { notify } from './reducers/notificationReducer'
+import { loggedUser } from './reducers/userReducer'
+import { connect } from 'react-redux'
+import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/blogReducer'
 
 class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      blogs: [],
-      user: null,
+/*      blogs: [],
+       user: null, */
       username: '',
       password: '', 
       title: '',
       author: '',
-      url: '',
-      notification: null
+      url: ''/* ,
+      notification: null */
     }
   }
 
+
   componentWillMount() {
-    blogService.getAll().then(blogs =>
+/*         blogService.getAll().then(blogs =>
       this.setState({ blogs })
-    )
+    ) */
+    this.props.initializeBlogs()
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      this.setState({ user })
+      this.props.loggedUser(user)
       blogService.setToken(user.token)
     }
+
   } 
 
-  notify = (message, type = 'info') => {
-    this.setState({
-      notification: {
-        message, type
-      }
-    })
-    setTimeout(() => {
-      this.setState({
-        notification: null
-      })     
-    }, 10000)
-  }
 
   like = (id) => async () => {
-    const liked = this.state.blogs.find(b=>b._id===id)
-    const updated = { ...liked, likes: liked.likes + 1 }
-    await blogService.update(id, updated)
-    this.notify(`you liked '${updated.title}' by ${updated.author}`)
-    this.setState({
+
+    const liked = this.props.blogs.find(b=>b._id===id)
+
+    this.props.likeBlog(liked)
+
+/*     const updated = { ...liked, likes: liked.likes + 1 }
+    await blogService.update(id, updated) */
+
+    this.props.notify(`you liked '${liked.title}' by ${liked.author}`)
+
+/*     this.setState({
       blogs: this.state.blogs.map(b => b._id === id ? updated : b)
-    })
+    }) */
   }
 
   remove = (id) => async () => {
-    const deleted = this.state.blogs.find(b => b._id === id)
+    const deleted = this.props.blogs.find(b => b._id === id)
     const ok = window.confirm(`remove blog '${deleted.title}' by ${deleted.author}?`)
     if ( ok===false) {
       return
     }
+    this.props.deleteBlog(id)
 
-    await blogService.remove(id)
-    this.notify(`blog '${deleted.title}' by ${deleted.author} removed`)
-    this.setState({
+    //await blogService.remove(id)
+    this.props.notify(`blog '${deleted.title}' by ${deleted.author} removed`)
+/*     this.setState({
       blogs: this.state.blogs.filter(b=>b._id!==id)
-    })
+    }) */
   }
 
   addBlog = async (event) => {
@@ -77,21 +79,21 @@ class App extends React.Component {
       author: this.state.author,
       url: this.state.url,
     }
-    
-    const result = await blogService.create(blog) 
-    this.notify(`blog '${blog.title}' by ${blog.author} added`)
+    this.props.createBlog(blog)
+   // const result = await blogService.create(blog) 
+    this.props.notify(`blog '${blog.title}' by ${blog.author} added`)
     this.setState({ 
       title: '', 
       url: '', 
-      author: '',
-      blogs: this.state.blogs.concat(result)
+      author: ''
     })
   }
 
   logout = () => {
     window.localStorage.removeItem('loggedBlogAppUser')
-    this.notify('logged out')
-    this.setState({ user: null })
+    this.props.notify('logged out')
+    this.props.loggedUser(null)
+    //this.setState({ user: null })
   }
 
   login = async (event) => {
@@ -104,10 +106,14 @@ class App extends React.Component {
 
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
       blogService.setToken(user.token)
-      this.notify('welcome back!')
-      this.setState({ username: '', password: '', user })
+      this.props.notify('Welcome back!')
+
+      this.setState({ username: '', password: '' })
+
+      this.props.loggedUser(user)
+
     } catch (exception) {
-      this.notify('käyttäjätunnus tai salasana virheellinen', 'error')
+      this.props.notify('käyttäjätunnus tai salasana virheellinen', 'error')
       setTimeout(() => {
         this.setState({ error: null })
       }, 5000)
@@ -119,10 +125,15 @@ class App extends React.Component {
   }
 
   render() {
-    if (this.state.user === null) {
+    console.log('App_render')
+
+    //console.log(this.state.blogs)
+   // console.log(this.props.blogs) 
+
+    if (this.props.user === null || this.props.user ==='') {
       return (
         <div>
-          <Notification notification={this.state.notification} />
+          <Notification notification={this.props.notification} />
           <h2>Kirjaudu sovellukseen</h2>
           <form onSubmit={this.login}>
             <div>
@@ -151,13 +162,13 @@ class App extends React.Component {
 
     const byLikes = (b1, b2) => b2.likes - b1.likes
 
-    const blogsInOrder = this.state.blogs.sort(byLikes)
+    const blogsInOrder = this.props.blogs.sort(byLikes)
 
     return (
       <div>
-        <Notification notification={this.state.notification} />
+        <Notification notification={this.props.notification} />
 
-        {this.state.user.name} logged in <button onClick={this.logout}>logout</button>
+        {this.props.user.name} logged in <button onClick={this.logout}>logout</button>
 
         <Togglable buttonLabel='uusi blogi'>
           <BlogForm 
@@ -176,7 +187,7 @@ class App extends React.Component {
             blog={blog} 
             like={this.like(blog._id)}
             remove={this.remove(blog._id)}
-            deletable={blog.user === undefined || blog.user.username === this.state.user.username}
+            deletable={blog.user === undefined || blog.user.username === this.props.user.username}
           />
         )}
       </div>
@@ -184,4 +195,19 @@ class App extends React.Component {
   }
 }
 
-export default App;
+ const mapStateToProps = (state) => {
+/*   console.log('mapsStateToProps')
+  console.log(state)  */
+  return {
+    user: state.user,
+    notification: state.notification,
+    blogs: state.blogs
+  }
+} 
+
+
+
+export default connect(
+  mapStateToProps,
+  { notify, loggedUser, initializeBlogs, createBlog, likeBlog, deleteBlog }
+)(App)
