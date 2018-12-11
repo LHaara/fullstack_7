@@ -1,5 +1,4 @@
 import React from 'react'
-import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
@@ -8,7 +7,14 @@ import loginService from './services/login'
 import { notify } from './reducers/notificationReducer'
 import { loggedUser } from './reducers/userReducer'
 import { connect } from 'react-redux'
-import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/blogReducer'
+import { initializeBlogs, createBlog/* , likeBlog, deleteBlog */ } from './reducers/blogReducer'
+import { initializeUsers} from './reducers/usersReducer'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import UserList from './components/UserList'
+import BlogList from './components/BlogList'
+import Blog from './components/Blog'
+import User from './components/User'
+
 
 class App extends React.Component {
   constructor(props) {
@@ -27,10 +33,8 @@ class App extends React.Component {
 
 
   componentWillMount() {
-/*         blogService.getAll().then(blogs =>
-      this.setState({ blogs })
-    ) */
-    this.props.initializeBlogs()
+    this.props.initializeUsers()
+    this.props.initializeBlogs()    
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
@@ -39,38 +43,6 @@ class App extends React.Component {
     }
 
   } 
-
-
-  like = (id) => async () => {
-
-    const liked = this.props.blogs.find(b=>b._id===id)
-
-    this.props.likeBlog(liked)
-
-/*     const updated = { ...liked, likes: liked.likes + 1 }
-    await blogService.update(id, updated) */
-
-    this.props.notify(`you liked '${liked.title}' by ${liked.author}`)
-
-/*     this.setState({
-      blogs: this.state.blogs.map(b => b._id === id ? updated : b)
-    }) */
-  }
-
-  remove = (id) => async () => {
-    const deleted = this.props.blogs.find(b => b._id === id)
-    const ok = window.confirm(`remove blog '${deleted.title}' by ${deleted.author}?`)
-    if ( ok===false) {
-      return
-    }
-    this.props.deleteBlog(id)
-
-    //await blogService.remove(id)
-    this.props.notify(`blog '${deleted.title}' by ${deleted.author} removed`)
-/*     this.setState({
-      blogs: this.state.blogs.filter(b=>b._id!==id)
-    }) */
-  }
 
   addBlog = async (event) => {
     event.preventDefault()
@@ -124,11 +96,24 @@ class App extends React.Component {
     this.setState({ [event.target.name]: event.target.value })
   }
 
-  render() {
-    console.log('App_render')
+  userById = (id) =>{
+    //console.log(this.props.users)
+    if (this.props.users !== '')    
+      return this.props.users.find(user => user._id === id)
+    }
 
-    //console.log(this.state.blogs)
-   // console.log(this.props.blogs) 
+  blogById = (id) =>{
+    //console.log(this.props.users)
+    if (this.props.blogs !== '')    
+      return this.props.blogs.find(blog => blog._id === id)
+    }
+
+
+  render() {
+/*     console.log('App_render')
+
+
+    console.log(this.props.users)  */
 
     if (this.props.user === null || this.props.user ==='') {
       return (
@@ -160,14 +145,12 @@ class App extends React.Component {
       )
     }
 
-    const byLikes = (b1, b2) => b2.likes - b1.likes
-
-    const blogsInOrder = this.props.blogs.sort(byLikes)
-
     return (
+      <Router>
       <div>
         <Notification notification={this.props.notification} />
-
+        <Link to="/">blogs</Link> &nbsp;
+        <Link to="/users">users</Link> &nbsp;
         {this.props.user.name} logged in <button onClick={this.logout}>logout</button>
 
         <Togglable buttonLabel='uusi blogi'>
@@ -179,19 +162,22 @@ class App extends React.Component {
             handleSubmit={this.addBlog}
           />
         </Togglable>
+       
+          <div>
+            <Route exact path="/" render={() => <BlogList /> } />
+            <Route exact path="/users" render={() => <UserList users={this.props.users} />} />
+            <Route exact path="/users/:id" render={({match}) =>
+              <User user={this.userById(match.params.id)} />}
+            />
+            <Route exact path="/blogs/:id" render={({match}) =>
+              <Blog blog={this.blogById(match.params.id)} />}
+            />
 
-        <h2>blogs</h2>
-        {blogsInOrder.map(blog => 
-          <Blog 
-            key={blog._id} 
-            blog={blog} 
-            like={this.like(blog._id)}
-            remove={this.remove(blog._id)}
-            deletable={blog.user === undefined || blog.user.username === this.props.user.username}
-          />
-        )}
+          </div>
+              
       </div>
-    );
+    </Router>  
+    )
   }
 }
 
@@ -201,7 +187,8 @@ class App extends React.Component {
   return {
     user: state.user,
     notification: state.notification,
-    blogs: state.blogs
+    blogs: state.blogs,
+    users: state.users
   }
 } 
 
@@ -209,5 +196,5 @@ class App extends React.Component {
 
 export default connect(
   mapStateToProps,
-  { notify, loggedUser, initializeBlogs, createBlog, likeBlog, deleteBlog }
+  { notify, loggedUser, initializeBlogs, createBlog, initializeUsers }
 )(App)
