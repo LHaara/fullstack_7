@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { Table } from 'semantic-ui-react'
 
 class BlogList extends React.Component {
 
@@ -9,26 +10,30 @@ class BlogList extends React.Component {
     const byLikes = (b1, b2) => b2.likes - b1.likes
     const blogsInOrder = this.props.blogs.sort(byLikes)
 
-    const blogStyle = {
-      paddingTop: 10,
-      paddingLeft: 2,
-      border: 'solid',
-      borderWidth: 1,
-      marginBottom: 5
-    }
-
     return (
       <div >
 
         <h2>blogs</h2>
-        {blogsInOrder.map(blog => 
-          <div key={blog._id} style={blogStyle}>
-
-            <Link to={`/blogs/${blog._id}`}>{blog.title} {blog.author}</Link>
-          </div>
-        )}
-
-
+        <Table compact='very' color='blue'>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Title</Table.HeaderCell>
+              <Table.HeaderCell>Author</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {blogsInOrder.map(blog =>
+              <Table.Row key={blog._id}>
+                <Table.Cell selectable>
+                  <Link to={`/blogs/${blog._id}`}>{blog.title} </Link>
+                </Table.Cell>
+                <Table.Cell>
+                  {blog.author}
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table>
       </div>
     )
   }

@@ -14,6 +14,7 @@ import UserList from './components/UserList'
 import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import User from './components/User'
+import { Container, Form, Button, Input } from 'semantic-ui-react'
 
 
 
@@ -103,7 +104,7 @@ class App extends React.Component {
   blogById = (id) =>{
     //console.log(this.props.users)
     if (this.props.blogs !== '') {
-/*       console.log('bloggyid')
+    /*       console.log('bloggyid')
       console.log(this.props.blogs) */
       return this.props.blogs.find(blog => blog._id === id)
     }
@@ -119,66 +120,72 @@ class App extends React.Component {
 
     if (this.props.user === null || this.props.user ==='') {
       return (
-        <div>
-          <Notification notification={this.props.notification} />
-          <h2>Kirjaudu sovellukseen</h2>
-          <form onSubmit={this.login}>
-            <div>
-              käyttäjätunnus
-              <input
-                type="text"
-                name="username"
-                value={this.state.username}
-                onChange={this.handleLoginChange}
-              />
-            </div>
-            <div>
-              salasana
-              <input
-                type="password"
-                name="password"
-                value={this.state.password}
-                onChange={this.handleLoginChange}
-              />
-            </div>
-            <button type="submit">kirjaudu</button>
-          </form>
-        </div>
+        <Container>
+          <div>
+            <Notification notification={this.props.notification} />
+            <h2>Kirjaudu sovellukseen</h2>
+            <Form onSubmit={this.login}>
+              <div>
+                <Input
+                  placeholder='käyttäjätunnus'
+                  size='mini'
+                  type="text"
+                  name="username"
+                  value={this.state.username}
+                  onChange={this.handleLoginChange}
+                />
+              </div>
+              <div>
+                <Input
+                  placeholder='salasana'
+                  size='mini'
+                  type="password"
+                  name="password"
+                  value={this.state.password}
+                  onChange={this.handleLoginChange}
+                />
+              </div>
+              <Button type="submit">kirjaudu</Button>
+            </Form>
+          </div>
+        </Container>
       )
     }
 
     return (
-      <Router>
-        <div>
-          <Notification notification={this.props.notification} />
-          <Link to="/">blogs</Link> &nbsp;
-          <Link to="/users">users</Link> &nbsp;
-          {this.props.user.name} logged in <button onClick={this.logout}>logout</button>
-
-          <Togglable buttonLabel='uusi blogi'>
-            <BlogForm
-              handleChange={this.handleLoginChange}
-              title={this.state.title}
-              author={this.state.author}
-              url={this.state.url}
-              handleSubmit={this.addBlog}
-            />
-          </Togglable>
-
+      <Container>
+        <Router>
           <div>
-            <Route exact path="/" render={() => <BlogList /> } />
-            <Route exact path="/users" render={() => <UserList users={this.props.users} />} />
-            <Route exact path="/users/:id" render={({ match }) =>
-              <User user={this.userById(match.params.id)} />}
-            />
-            <Route exact path="/blogs/:id" render={({ match }) =>
-              <Blog blog={this.blogById(match.params.id)} />}
-            />
+            <Notification notification={this.props.notification} />
+            <Link to="/">blogs</Link> &nbsp;
+            <Link to="/users">users</Link> &nbsp;
+            {this.props.user.name} logged in <Button onClick={this.logout}>logout</Button>
+
+            <Togglable buttonLabel='uusi blogi'>
+              <BlogForm
+                handleChange={this.handleLoginChange}
+                title={this.state.title}
+                author={this.state.author}
+                url={this.state.url}
+                handleSubmit={this.addBlog}
+              />
+            </Togglable>
+
+            <div>
+              <Route exact path="/" render={() => <BlogList /> } />
+              <Route exact path="/users" render={() => <UserList users={this.props.users} />} />
+              <Route exact path="/users/:id" render={({ match }) =>
+                <User user={this.userById(match.params.id)} />}
+              />
+              <Route exact path="/blogs/:id" render={({ match }) =>
+                <Blog blog={this.blogById(match.params.id)} />}
+              />
+
+            </div>
 
           </div>
-
-        </div>
-      </Router>
+        </Router>
+      </Container>
     )
   }
 }

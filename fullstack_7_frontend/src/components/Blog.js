@@ -5,6 +5,7 @@ import { deleteBlog } from '../reducers/blogReducer'
 import { notify } from '../reducers/notificationReducer'
 import blogs from '../services/blogs'
 import PropTypes from 'prop-types'
+import { Button } from 'semantic-ui-react'
 
 class Blog extends React.Component {
   constructor(props) {
@@ -61,15 +62,6 @@ class Blog extends React.Component {
 
     if (blog === undefined)
       return null
-    //console.log('blog.comments')
-    //console.log(blog)
-
-    /*     console.log('blogrender')
-    console.log(this.props) */
-
-    /*
-    console.log('after init')
-    console.log(this.state.comments) */
 
     const adder = blog.user ? blog.user.name : 'anonymous'
     const deletable = blog.user === undefined || blog.user.username === this.props.user.username
@@ -86,19 +78,19 @@ class Blog extends React.Component {
             <a href={blog.url}>{blog.url}</a>
           </div>
           <div>
-            {blog.likes} likes <button onClick={this.like(blog._id)}>like</button>
+            {blog.likes} likes <Button onClick={this.like(blog._id)}>like</Button>
           </div>
           <div>
             added by {adder}
           </div>
-          {deletable && <div><button onClick={this.remove(blog._id)}>delete</button></div>}
+          {deletable && <div><Button onClick={this.remove(blog._id)}>delete</Button></div>}
         </div>
         <h3>comments</h3>
         <input value={this.state.comment}
           name='comment'
           onChange={this.handleCommentChange}
         />
-        <button onClick={this.addComment(blog._id)}>add comment</button>
+        <Button onClick={this.addComment(blog._id)}>add comment</Button>
         <ul>
           {blogcomments.map(comment => <li key={comment._id}>{comment.content}</li>)}
         </ul>
