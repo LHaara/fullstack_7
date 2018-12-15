@@ -1,15 +1,15 @@
 import blogs from '../services/blogs'
 
 const blogReducer = (state = [], action) => {
-  console.log('state now: ',state)
-  console.log(action)
+/*   console.log('state now: ',state)
+  console.log(action) */
   switch(action.type){
 
   case 'LIKE': {
     const old = state.filter(blogs => blogs._id !==action.updatedBlog._id)
-    console.log(old)
+/*     console.log(old) */
     const toreturn = [...old, { ...action.updatedBlog }]
-    console.log(toreturn)
+/*     console.log(toreturn) */
     return toreturn
   }
   case 'CREATE_BLOG':
@@ -53,8 +53,8 @@ export const likeBlog = (blog) => {
   const liked = { ...blog, likes: blog.likes + 1 }
   return async (dispatch) => {
     const updatedBlog = await blogs.update(blog._id, liked)
-    console.log('likeblog')
-    console.log(updatedBlog)
+/*     console.log('likeblog')
+    console.log(updatedBlog) */
     dispatch({
       type: 'LIKE',
       updatedBlog

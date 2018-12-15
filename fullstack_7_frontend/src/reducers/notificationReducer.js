@@ -11,7 +11,7 @@ const notificationReducer = (state = '', action) => {
 }
 
 export const notify = (message, type = 'info') => {
-  const notification = {message, type}
+  const notification = { message, type }
   return async (dispatch) => {
     dispatch({
       type: 'SET_MESSAGE',

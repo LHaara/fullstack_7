@@ -22,8 +22,8 @@ class Blog extends React.Component {
   }
   like = (id) => async () => {
     const liked = this.props.blogs.find(b=>b._id===id)
-    console.log('like')
-    console.log(liked)
+    /*     console.log('like')
+    console.log(liked) */
 
     this.props.likeBlog(liked)
     this.props.notify(`you liked '${liked.title}' by ${liked.author}`)
@@ -43,6 +43,7 @@ class Blog extends React.Component {
   addComment = (id) => async () => {
     const newComment = await blogs.createComment(id, { content: this.state.comment })
     //console.log('addcomment')
+    this.props.notify(`comment '${newComment.content}' added to blog  '${this.props.blog.title}'`)
     this.setState({
       comments: this.state.comments.concat(newComment),
       comment: ''
@@ -61,14 +62,14 @@ class Blog extends React.Component {
     if (blog === undefined)
       return null
     //console.log('blog.comments')
-    console.log(blog)
+    //console.log(blog)
 
     /*     console.log('blogrender')
     console.log(this.props) */
 
-
+    /*
     console.log('after init')
-    console.log(this.state.comments)  
+    console.log(this.state.comments) */
 
     const adder = blog.user ? blog.user.name : 'anonymous'
     const deletable = blog.user === undefined || blog.user.username === this.props.user.username

@@ -12,7 +12,7 @@ const User = (props) => {
       <h1>{props.user.name}</h1>
       <h2>Added blogs</h2>
       <ul>
-        {props.user.blogs.map(blog=>
+        {props.user.blogs.map(blog =>
           <li key={blog._id}>
             {blog.title} by {blog.author}
           </li>

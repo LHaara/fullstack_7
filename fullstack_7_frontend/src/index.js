@@ -10,22 +10,21 @@ import userReducer from './reducers/userReducer'
 import blogReducer from './reducers/blogReducer'
 import usersReducer from './reducers/usersReducer'
 
-
- const reducer = combineReducers({
+const reducer = combineReducers({
   notification: notificationReducer,
   user: userReducer,
   blogs: blogReducer,
   users: usersReducer
-}) 
+})
 
 const store = createStore(reducer, applyMiddleware(thunk))
 
 /* const render = () => { */
-  ReactDOM.render(
-    <Provider store={store}>
-      <App />
-    </Provider>,
-    document.getElementById('root'))
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root'))
 
 /* }
 
