@@ -18,8 +18,6 @@ userSchema.statics.format = (user) => {
   }
 }
 
-// koska käytän samaa kantaa kuin eräässä toisessa sovelluksessa
-// jossa myös Users-kokoelma, talletan tämän sovelluksen 
-// käyttäjät kokoelmaan BlogUsers
+
 const User = mongoose.model('User', userSchema)
 module.exports = User

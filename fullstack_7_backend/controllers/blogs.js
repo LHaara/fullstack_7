@@ -2,11 +2,13 @@ const blogRouter = require('express').Router()
 const jwt = require('jsonwebtoken')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const Comment = require('../models/comment')
 
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
     .populate('user', {username: 1, name: 1})
+    .populate('comments', {content: 1})
 
   response.json(blogs)
 })
@@ -80,9 +82,39 @@ blogRouter.delete('/:id', async (request, response) => {
 
 blogRouter.put('/:id', async (request, response) => {
   const { title, author, url, likes } = request.body
+
   const blog = await Blog.findByIdAndUpdate(request.params.id, { title, author, url, likes } , {new: true})
-  
+
   response.send(blog)
 })
+
+blogRouter.post('/:id/comments', async (request, response) => {
+  const body = request.body
+
+  try {
+    if ( body.content === undefined ) {
+      return response.status(400).json({ error: 'comment missing'})
+    }
+
+    const blog = await Blog.findById(request.params.id)
+
+    const comment = new Comment({content: body.content, blog: blog._id})
+    const result = await comment.save()
+
+    blog.comments = blog.comments.concat(comment._id)
+    await blog.save()
+
+    response.status(201).json(result)
+  } catch (exception) {
+    console.log(exception)
+    response.status(500).json({ error: 'something went wrong...' })
+  }
+})
+
+blogRouter.get('/comments', async (request, response) => {
+  const comments = await Comment.find({})
+  response.json(comments)
+})
+
 
 module.exports = blogRouter

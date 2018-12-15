@@ -16,33 +16,31 @@ import Blog from './components/Blog'
 import User from './components/User'
 
 
+
 class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-/*      blogs: [],
-       user: null, */
       username: '',
-      password: '', 
+      password: '',
       title: '',
       author: '',
-      url: ''/* ,
-      notification: null */
+      url: '',
+      comment: ''
     }
   }
 
 
   componentWillMount() {
     this.props.initializeUsers()
-    this.props.initializeBlogs()    
+    this.props.initializeBlogs()
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       this.props.loggedUser(user)
       blogService.setToken(user.token)
     }
-
-  } 
+  }
 
   addBlog = async (event) => {
     event.preventDefault()
@@ -52,11 +50,11 @@ class App extends React.Component {
       url: this.state.url,
     }
     this.props.createBlog(blog)
-   // const result = await blogService.create(blog) 
+    // const result = await blogService.create(blog) 
     this.props.notify(`blog '${blog.title}' by ${blog.author} added`)
-    this.setState({ 
-      title: '', 
-      url: '', 
+    this.setState({
+      title: '',
+      url: '',
       author: ''
     })
   }
@@ -98,19 +96,23 @@ class App extends React.Component {
 
   userById = (id) =>{
     //console.log(this.props.users)
-    if (this.props.users !== '')    
+    if (this.props.users !== '')
       return this.props.users.find(user => user._id === id)
-    }
+  }
 
   blogById = (id) =>{
     //console.log(this.props.users)
-    if (this.props.blogs !== '')    
+    if (this.props.blogs !== '') {
+/*       console.log('bloggyid')
+      console.log(this.props.blogs) */
       return this.props.blogs.find(blog => blog._id === id)
     }
+  }
 
 
   render() {
-/*     console.log('App_render')
+
+    /*     console.log('App_render')
 
 
     console.log(this.props.users)  */
@@ -147,41 +149,41 @@ class App extends React.Component {
 
     return (
       <Router>
-      <div>
-        <Notification notification={this.props.notification} />
-        <Link to="/">blogs</Link> &nbsp;
-        <Link to="/users">users</Link> &nbsp;
-        {this.props.user.name} logged in <button onClick={this.logout}>logout</button>
+        <div>
+          <Notification notification={this.props.notification} />
+          <Link to="/">blogs</Link> &nbsp;
+          <Link to="/users">users</Link> &nbsp;
+          {this.props.user.name} logged in <button onClick={this.logout}>logout</button>
 
-        <Togglable buttonLabel='uusi blogi'>
-          <BlogForm 
-            handleChange={this.handleLoginChange}
-            title={this.state.title}
-            author={this.state.author}
-            url={this.state.url}
-            handleSubmit={this.addBlog}
-          />
-        </Togglable>
-       
+          <Togglable buttonLabel='uusi blogi'>
+            <BlogForm
+              handleChange={this.handleLoginChange}
+              title={this.state.title}
+              author={this.state.author}
+              url={this.state.url}
+              handleSubmit={this.addBlog}
+            />
+          </Togglable>
+
           <div>
             <Route exact path="/" render={() => <BlogList /> } />
             <Route exact path="/users" render={() => <UserList users={this.props.users} />} />
-            <Route exact path="/users/:id" render={({match}) =>
+            <Route exact path="/users/:id" render={({ match }) =>
               <User user={this.userById(match.params.id)} />}
             />
-            <Route exact path="/blogs/:id" render={({match}) =>
+            <Route exact path="/blogs/:id" render={({ match }) =>
               <Blog blog={this.blogById(match.params.id)} />}
             />
 
           </div>
-              
-      </div>
-    </Router>  
+
+        </div>
+      </Router>
     )
   }
 }
 
- const mapStateToProps = (state) => {
+const mapStateToProps = (state) => {
 /*   console.log('mapsStateToProps')
   console.log(state)  */
   return {
@@ -190,7 +192,7 @@ class App extends React.Component {
     blogs: state.blogs,
     users: state.users
   }
-} 
+}
 
 
 

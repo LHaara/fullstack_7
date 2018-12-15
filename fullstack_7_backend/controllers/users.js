@@ -9,6 +9,7 @@ usersRouter.get('/', async (request, response) => {
   response.send(users.map(User.format))
 })
 
+
 usersRouter.post('/', async (request, response) => {
   try {
     const { username, name, password, adult } = request.body

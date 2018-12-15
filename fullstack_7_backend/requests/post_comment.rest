@@ -1,0 +1,6 @@
+POST http://localhost:3003/api/blogs/5bf8179caf33e954d622ecda/comments
+content-type: application/json
+
+{
+    "content": "fantsu blogi"
+}

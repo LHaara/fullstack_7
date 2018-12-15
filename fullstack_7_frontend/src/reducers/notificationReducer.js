@@ -17,16 +17,16 @@ export const notify = (message, type = 'info') => {
       type: 'SET_MESSAGE',
       notification
     })
-   
-     setTimeout(() => {
+
+    setTimeout(() => {
 
       dispatch({
         type: 'SET_MESSAGE',
         notification: {
           message: ''
-        }        
+        }
       })
-    }, 4000) 
+    }, 4000)
 
   }
 }

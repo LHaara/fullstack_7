@@ -2,31 +2,31 @@ import blogs from '../services/blogs'
 
 const blogReducer = (state = [], action) => {
   console.log('state now: ',state)
-  console.log(action.type)
   console.log(action)
   switch(action.type){
 
-    case 'LIKE': {
-      const old = state.filter(blogs => blogs._id !==action.updatedBlog._id)
-      return [...old, { ...action.updatedBlog }]
-    }
-    case 'CREATE_BLOG':
-      return state.concat(action.content)
+  case 'LIKE': {
+    const old = state.filter(blogs => blogs._id !==action.updatedBlog._id)
+    console.log(old)
+    const toreturn = [...old, { ...action.updatedBlog }]
+    console.log(toreturn)
+    return toreturn
+  }
+  case 'CREATE_BLOG':
+    return state.concat(action.content)
 
-    case 'INIT_BLOGS': 
-      return state = action.content
+  case 'INIT_BLOGS': 
+    return state = action.content
 
-    case 'DELETE_BLOG':
-      const newBlogs = state.filter(blogs => blogs._id !== action.id)
-      return newBlogs   
-    default:
-      return state
+  case 'DELETE_BLOG':
+    const newBlogs = state.filter(blogs => blogs._id !== action.id)
+    return newBlogs
+  default:
+    return state
 
   }
 
 }
-
-
 
 export const createBlog = (blogText) => {
   return async (dispatch) => {
@@ -53,12 +53,16 @@ export const likeBlog = (blog) => {
   const liked = { ...blog, likes: blog.likes + 1 }
   return async (dispatch) => {
     const updatedBlog = await blogs.update(blog._id, liked)
+    console.log('likeblog')
+    console.log(updatedBlog)
     dispatch({
       type: 'LIKE',
       updatedBlog
     })
   }
 }
+
+
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
